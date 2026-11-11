@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Учёба — планировщик</title>
+<style>
+:root{--bg:#f7f8fa;--panel:#fff;--ink:#20242b;--muted:#818895;--line:#e9ebef;--accent:#5267d8;--accent-soft:#eef0ff;--green:#29966b;--red:#d45b5b;--shadow:0 8px 28px #20242b0a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:100vh;max-width:1500px;margin:auto}
+aside{background:#fff;border-right:1px solid var(--line);padding:28px 18px;display:flex;flex-direction:column;gap:28px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:750;font-size:19px;padding:0 8px}.brandmark{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center}
+.navlabel{font-size:11px;color:#a0a5af;font-weight:700;letter-spacing:.09em;padding:0 10px;margin-bottom:8px}.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:#666e7b;text-align:left;padding:10px 12px;border-radius:9px;display:flex;gap:11px;align-items:center}.nav button.active,.nav button:hover{background:var(--accent-soft);color:var(--accent)}.nav .ico{width:18px;text-align:center}
+.sidebar-note{margin-top:auto;background:#f7f8fc;border:1px solid var(--line);padding:14px;border-radius:12px;color:#697080;font-size:12px}
+main{padding:34px clamp(18px,4vw,54px) 50px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:30px}.eyebrow{color:var(--muted);font-size:13px}.top h1{font-size:27px;margin:3px 0 0;letter-spacing:-.04em}.date-chip{background:#fff;border:1px solid var(--line);padding:9px 13px;border-radius:10px;color:#687080;font-size:13px}
+.page{display:none}.page.active{display:block}.welcome{margin-bottom:22px}.welcome h2{font-size:22px;margin:0 0 4px;letter-spacing:-.03em}.welcome p{color:var(--muted);margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:22px 0}.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}.stat{padding:17px}.stat-label{color:var(--muted);font-size:12px}.stat-value{font-size:25px;font-weight:700;margin-top:5px;letter-spacing:-.04em}.stat-foot{font-size:11px;color:var(--muted);margin-top:2px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.85fr);gap:16px}.card{padding:19px;margin-bottom:16px}.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}.cardhead h3{font-size:15px;margin:0}.subtle{color:var(--muted);font-size:12px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;color:#4f5867;font-size:13px}.btn.primary{background:var(--accent);border-color:var(--accent);color:white}.btn.small{padding:5px 9px;font-size:12px}.btn:hover{filter:brightness(.98)}
+.progress{height:7px;background:#edf0f4;border-radius:20px;overflow:hidden}.progress span{display:block;height:100%;background:var(--accent);border-radius:20px;transition:width .2s}
+.tasklist{display:grid;gap:9px}.task{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid #eef0f3;border-radius:10px}.task input{accent-color:var(--accent);width:16px;height:16px}.task-main{flex:1;min-width:0}.task-title{font-size:13px;font-weight:600}.task.done .task-title{text-decoration:line-through;color:#a1a6b0}.task-meta{font-size:11px;color:var(--muted);margin-top:2px}.tag{font-size:10px;border-radius:20px;padding:4px 7px;background:#f1f3f6;color:#697080;white-space:nowrap}.task-actions{border:0;background:none;color:#a0a5af;font-size:17px;padding:2px 4px}.empty{padding:22px 10px;text-align:center;color:var(--muted);font-size:13px}
+.subjects{display:grid;gap:12px}.subject-row{display:grid;grid-template-columns:75px 1fr 30px;gap:10px;align-items:center;font-size:12px}.subject-row .progress{height:6px}
+.schedule-row{display:flex;gap:14px;padding:11px 0;border-bottom:1px solid #f0f1f4}.schedule-row:last-child{border:0}.time{font-size:12px;color:var(--muted);width:44px}.schedule-title{font-size:13px;font-weight:600}.schedule-sub{font-size:11px;color:var(--muted)}
+.formrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:grid;gap:5px;margin-bottom:11px}.field label{font-size:12px;color:#707887}.field input,.field select{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;background:white;color:var(--ink);outline:none}.field input:focus,.field select:focus{border-color:#9ba7f2}
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}.filter{border:1px solid var(--line);background:white;border-radius:20px;padding:6px 11px;font-size:12px;color:#6f7785}.filter.active{background:var(--accent-soft);color:var(--accent);border-color:#dfe3ff}
+.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}.calday{min-height:83px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;font-size:12px}.calday.today{border-color:var(--accent);background:#f8f8ff}.calday.muted{opacity:.4}.calday strong{display:block;margin-bottom:6px}.dot{display:block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin:3px 0}.weekday{text-align:center;color:var(--muted);font-size:11px;padding:5px}
+.timerbox{text-align:center;padding:26px 10px}.timer{font-size:62px;letter-spacing:-.06em;font-weight:650;font-variant-numeric:tabular-nums;margin:10px 0 18px}.timer-controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.timer-mode{display:flex;justify-content:center;gap:7px}.timer-mode button{border:0;background:#f2f3f7;color:#697080;padding:7px 12px;border-radius:20px;font-size:12px}.timer-mode button.active{background:var(--accent-soft);color:var(--accent)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222936;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s}.toast.show{opacity:1}
+.modalback{position:fixed;inset:0;background:#15192366;display:none;place-items:center;padding:18px;z-index:5}.modalback.show{display:grid}.modal{background:white;border-radius:16px;padding:22px;width:min(440px,100%);box-shadow:0 20px 70px #0002}.modal h3{margin:0 0 16px}.top-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.color-select{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;color:#687080;font-size:12px}.task-actions.edit{font-size:13px;color:var(--accent)}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+footer{color:#a0a5af;font-size:11px;text-align:center;margin-top:24px}
+@media(max-width:850px){.app{grid-template-columns:1fr}aside{position:sticky;top:0;z-index:3;padding:10px 12px;border-right:0;border-bottom:1px solid var(--line);gap:9px}.brand{display:none}.navlabel,.sidebar-note{display:none}.nav{display:flex;overflow-x:auto;gap:4px}.nav button{white-space:nowrap;padding:9px 11px;font-size:12px}.nav .ico{display:none}main{padding:23px 16px 40px}.grid2{grid-template-columns:1fr}}
+@media(max-width:520px){.top h1{font-size:23px}.date-chip{font-size:11px;padding:8px}.stats{gap:8px}.stat{padding:12px}.stat-value{font-size:21px}.stat-label{font-size:10px}.formrow{grid-template-columns:1fr}.calday{min-height:66px;padding:5px;font-size:11px}.timer{font-size:52px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand"><span class="brandmark">✓</span> Учёба</div>
+  <div><div class="navlabel">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+    <nav class="nav">
+      <button class="active" data-page="home"><span class="ico">⌂</span>Обзор</button>
+      <button data-page="tasks"><span class="ico">☷</span>Задания</button>
+      <button data-page="schedule"><span class="ico">▦</span>Расписание</button>
+      <button data-page="calendar"><span class="ico">▣</span>Календарь</button>
+      <button data-page="timer"><span class="ico">◷</span>Таймер</button>
+    </nav>
+  </div>
+  <div class="sidebar-note">Небольшие шаги каждый день помогают двигаться к большой цели. Не забывай отдыхать 🌿</div>
+</aside>
+<main>
+  <header class="top">
+    <div><div class="eyebrow">ТВОЁ ПРОСТРАНСТВО ДЛЯ УЧЁБЫ</div><h1 id="pageTitle">Обзор</h1></div>
+    <div class="top-tools"><select class="color-select" id="themeColor" aria-label="Цвет оформления"><option value="blue">Синий</option><option value="purple">Фиолетовый</option><option value="green">Зелёный</option><option value="pink">Розовый</option><option value="orange">Оранжевый</option></select><div class="date-chip" id="todayLabel"></div></div>
+  </header>
+
+  <section class="page active" id="home">
+    <div class="welcome"><h2 id="greeting">Привет! Готова спланировать день?</h2><p>Вот что у тебя запланировано.</p></div>
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Задач на сегодня</div><div class="stat-value" id="statTasks">0</div><div class="stat-foot">всего заданий</div></div>
+      <div class="stat"><div class="stat-label">Выполнено</div><div class="stat-value" id="statDone">0%</div><div class="stat-foot">от сегодняшнего плана</div></div>
+      <div class="stat"><div class="stat-label">Время занятий</div><div class="stat-value" id="statTime">0 мин</div><div class="stat-foot">по твоим задачам на сегодня</div></div>
+    </div>
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <div class="cardhead"><h3>Задачи на сегодня</h3><button class="btn small" onclick="openTaskModal()">＋ Добавить</button></div>
+          <div class="progress" style="margin-bottom:14px"><span id="todayProgress" style="width:0%"></span></div>
+          <div class="tasklist" id="todayTasks"></div>
+        </div>
+        <div class="card">
+          <div class="cardhead"><h3>Ближайшие события</h3><button class="btn small" onclick="showPage('calendar')">К календарю →</button></div>
+          <div id="upcoming"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="cardhead"><h3>Прогресс по предметам</h3><span class="subtle">задачи</span></div>
+          <div class="subjects" id="subjectProgress"></div>
+        </div>
+        <div class="card">
+          <div class="cardhead"><h3>Быстрый старт</h3></div>
+          <p class="subtle">Добавь задание, чтобы не держать всё в голове.</p>
+          <button class="btn primary" style="width:100%" onclick="openTaskModal()">＋ Новое задание</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="tasks">
+    <div class="card">
+      <div class="cardhead"><div><h3>Все задания</h3><div class="subtle">Домашняя работа, подготовка и повторение</div></div><button class="btn primary" onclick="openTaskModal()">＋ Добавить</button></div>
+      <div class="filters" id="taskFilters">
+        <button class="filter active" data-filter="all">Все</button><button class="filter" data-filter="active">Активные</button><button class="filter" data-filter="done">Выполненные</button>
+      </div>
+      <div class="tasklist" id="allTasks"></div>
+    </div>
+  </section>
+
+  <section class="page" id="schedule">
+    <div class="card">
+      <div class="cardhead"><div><h3>Моё расписание</h3><div class="subtle">Пример недели — можешь заменить своими уроками</div></div><button class="btn primary" onclick="openScheduleModal()">＋ Урок</button></div>
+      <div class="filters" id="dayFilters"></div>
+      <div id="scheduleList"></div>
+    </div>
+  </section>
+
+  <section class="page" id="calendar">
+    <div class="card">
+      <div class="cardhead"><div><h3 id="monthTitle">Календарь</h3><div class="subtle">Контрольные, самостоятельные и важные даты</div></div><div><button class="btn small" onclick="changeMonth(-1)">←</button> <button class="btn small" onclick="changeMonth(1)">→</button> <button class="btn primary small" onclick="openEventModal()">＋ Событие</button></div></div>
+      <div class="calendar" id="calendarGrid"></div>
+    </div>
+    <div class="card"><div class="cardhead"><h3>Ближайшие события</h3></div><div id="eventList"></div></div>
+  </section>
+
+  <section class="page" id="timer">
+    <div class="grid2">
+      <div class="card timerbox">
+        <div class="cardhead"><h3>Фокус-сессия</h3><span class="subtle">Метод Pomodoro</span></div>
+        <div class="timer-mode"><button class="active" data-min="25">Учёба · 25 мин</button><button data-min="5">Перерыв · 5 мин</button><button data-min="15">Длинный · 15 мин</button></div>
+        <div class="timer" id="timerDisplay">25:00</div>
+        <div class="timer-controls"><button class="btn primary" id="timerStart">Начать</button><button class="btn" id="timerReset">Сбросить</button></div>
+        <p class="subtle" id="timerHint">Убери отвлекающие факторы и сосредоточься на одной задаче.</p>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Как заниматься с перерывами</h3>
+        <p class="subtle">1. Выбери одну небольшую задачу.</p><p class="subtle">2. Работай, пока идёт таймер.</p><p class="subtle">3. Сделай перерыв, подвигайся и попей воды.</p><p class="subtle">4. Повтори, если есть силы и время.</p>
+      </div>
+    </div>
+  </section>
+  <footer>Твои данные сохраняются локально в этом браузере. Это первая версия — её можно развивать дальше.</footer>
+</main>
+</div>
+
+<div class="modalback" id="taskModal"><div class="modal">
+  <h3 id="taskModalTitle">Новое задание</h3>
+  <form id="taskForm">
+    <div class="field"><label>Что нужно сделать?</label><input id="taskName" required placeholder="Например, решить номера 5–8"></div>
+    <div class="formrow"><div class="field"><label>Предмет</label><select id="taskSubject"><option>Математика</option><option>Русский язык</option><option>Химия</option><option>Биология</option><option>История</option><option>Литература</option><option>Английский</option><option>Другое</option></select></div><div class="field"><label>Дата</label><input id="taskDate" type="date" required></div></div>
+    <div class="field"><label>Сколько минут займёт?</label><input id="taskMinutes" type="number" min="5" max="600" value="30"></div>
+    <div class="modalfoot"><button type="button" class="btn" onclick="closeModal('taskModal')">Отмена</button><button class="btn primary">Сохранить</button></div>
+  </form>
+</div></div>
+<div class="modalback" id="scheduleModal"><div class="modal">
+  <h3>Добавить урок</h3><form id="scheduleForm">
+    <div class="field"><label>Предмет / занятие</label><input id="lessonName" required placeholder="Например, Алгебра"></div>
+    <div class="formrow"><div class="field"><label>День недели</label><select id="lessonDay"><option value="1">Понедельник</option><option value="2">Вторник</option><option value="3">Среда</option><option value="4">Четверг</option><option value="5">Пятница</option><option value="6">Суббота</option><option value="0">Воскресенье</option></select></div><div class="field"><label>Время</label><input id="lessonTime" type="time" value="09:00" required></div></div>
+    <div class="field"><label><input id="lessonWeekly" type="checkbox" checked style="width:auto;margin-right:7px"> Повторять каждую неделю</label></div>
+    <div class="field" id="lessonOnceWrap" style="display:none"><label>Дата занятия</label><input id="lessonOnceDate" type="date"></div>
+    <div class="modalfoot"><button type="button" class="btn" onclick="closeModal('scheduleModal')">Отмена</button><button class="btn primary">Сохранить</button></div>
+  </form>
+</div></div>
+<div class="modalback" id="eventModal"><div class="modal">
+  <h3>Новое событие</h3><form id="eventForm">
+    <div class="field"><label>Название</label><input id="eventName" required placeholder="Например, контрольная по химии"></div>
+    <div class="formrow"><div class="field"><label>Дата</label><input id="eventDate" type="date" required></div><div class="field"><label>Тип</label><select id="eventType"><option>Контрольная</option><option>Самостоятельная</option><option>Экзамен</option><option>Другое</option></select></div></div>
+    <div class="modalfoot"><button type="button" class="btn" onclick="closeModal('eventModal')">Отмена</button><button class="btn primary">Сохранить</button></div>
+  </form>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+const today=new Date(); const iso=d=>{let x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`};
+const dayNames=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+const monthNames=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const key='studyPlannerV1';
+let data={tasks:[],events:[],lessons:[],theme:'blue'};
+let editingTaskId=null;
+try{data={...data,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(e){}
+let taskFilter='all',selectedDay=today.getDay(),calDate=new Date(today.getFullYear(),today.getMonth(),1);
+function save(){localStorage.setItem(key,JSON.stringify(data));renderAll()}
+function toast(msg){let t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function closeModal(id){$(id).classList.remove('show')}
+function showModal(id){$(id).classList.add('show')}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));$('pageTitle').textContent=({home:'Обзор',tasks:'Задания',schedule:'Расписание',calendar:'Календарь',timer:'Таймер'})[id];}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+function openTaskModal(){$('taskForm').reset();editingTaskId=null;$('taskModalTitle').textContent='Новое задание';$('taskDate').value=iso(today);$('taskMinutes').value=30;showModal('taskModal');$('taskName').focus()}
+function editTask(id){let t=data.tasks.find(x=>x.id===id);if(!t)return;editingTaskId=id;$('taskModalTitle').textContent='Редактировать задание';$('taskName').value=t.name;$('taskSubject').value=t.subject;$('taskDate').value=t.date;$('taskMinutes').value=t.minutes;showModal('taskModal');$('taskName').focus()}
+function openScheduleModal(){$('scheduleForm').reset();$('lessonWeekly').checked=true;$('lessonOnceWrap').style.display='none';showModal('scheduleModal')}
+$('lessonWeekly').onchange=()=>{$('lessonOnceWrap').style.display=$('lessonWeekly').checked?'none':'block';if(!$('lessonOnceDate').value)$('lessonOnceDate').value=iso(today)}
+function openEventModal(){$('eventDate').value=iso(today);showModal('eventModal')}
+$('taskForm').onsubmit=e=>{e.preventDefault();let values={name:$('taskName').value.trim(),subject:$('taskSubject').value,date:$('taskDate').value,minutes:+$('taskMinutes').value||30};if(editingTaskId!==null){let t=data.tasks.find(x=>x.id===editingTaskId);if(t)Object.assign(t,values);toast('Изменения сохранены')}else{data.tasks.push({id:Date.now(),...values,done:false});toast('Задание добавлено')}e.target.reset();editingTaskId=null;closeModal('taskModal');save()};
+$('scheduleForm').onsubmit=e=>{e.preventDefault();let weekly=$('lessonWeekly').checked;data.lessons.push({id:Date.now(),name:$('lessonName').value.trim(),day:+$('lessonDay').value,time:$('lessonTime').value,weekly,onceDate:weekly?'':$('lessonOnceDate').value});e.target.reset();closeModal('scheduleModal');toast(weekly?'Урок будет повторяться каждую неделю':'Разовое занятие добавлено');save()};
+$('eventForm').onsubmit=e=>{e.preventDefault();data.events.push({id:Date.now(),name:$('eventName').value.trim(),date:$('eventDate').value,type:$('eventType').value});e.target.reset();closeModal('eventModal');toast('Событие добавлено');save()};
+function taskHTML(t){return `<div class="task ${t.done?'done':''}"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${t.id})"><div class="task-main"><div class="task-title">${esc(t.name)}</div><div class="task-meta">${esc(t.subject)} · ${t.minutes} мин · ${formatDate(t.date)}</div></div><span class="tag">${esc(t.subject)}</span><button class="task-actions edit" title="Изменить" onclick="editTask(${t.id})">✎</button><button class="task-actions" title="Удалить" onclick="deleteTask(${t.id})">×</button></div>`}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function formatDate(s){if(!s)return '';let [y,m,d]=s.split('-').map(Number);return `${d}.${String(m).padStart(2,'0')}`}
+function toggleTask(id){let t=data.tasks.find(x=>x.id===id);if(t)t.done=!t.done;save()}
+function deleteTask(id){data.tasks=data.tasks.filter(x=>x.id!==id);save();toast('Задание удалено')}
+function renderTasks(){
+ let todayTasks=data.tasks.filter(t=>t.date===iso(today));let done=todayTasks.filter(t=>t.done).length;let pct=todayTasks.length?Math.round(done/todayTasks.length*100):0;
+ $('statTasks').textContent=todayTasks.length;$('statDone').textContent=pct+'%';$('statTime').textContent=todayTasks.reduce((a,t)=>a+(+t.minutes||0),0)+' мин';$('todayProgress').style.width=pct+'%';
+ $('todayTasks').innerHTML=todayTasks.length?todayTasks.map(taskHTML).join(''):'<div class="empty">На сегодня пока нет заданий. Добавь первое ✨</div>';
+ let list=data.tasks.filter(t=>taskFilter==='all'||(taskFilter==='active'?!t.done:t.done)).sort((a,b)=>a.date.localeCompare(b.date));
+ $('allTasks').innerHTML=list.length?list.map(taskHTML).join(''):'<div class="empty">Здесь пока пусто. Добавь задание.</div>';
+ let subjects=[...new Set(data.tasks.map(t=>t.subject))];$('subjectProgress').innerHTML=subjects.length?subjects.map(s=>{let a=data.tasks.filter(t=>t.subject===s),p=Math.round(a.filter(t=>t.done).length/a.length*100);return `<div class="subject-row"><span>${esc(s)}</span><div class="progress"><span style="width:${p}%"></span></div><span>${p}%</span></div>`}).join(''):'<div class="empty">Статистика появится после добавления заданий.</div>';
+}
+$('taskFilters').querySelectorAll('button').forEach(b=>b.onclick=()=>{taskFilter=b.dataset.filter;$('taskFilters').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderTasks()});
+function dateForSelectedDay(){let d=new Date(today);let mondayOffset=(today.getDay()+6)%7;d.setDate(today.getDate()-mondayOffset+((selectedDay+6)%7));return iso(d)}
+function renderSchedule(){ $('dayFilters').innerHTML=dayNames.map((d,i)=>`<button class="filter ${i===selectedDay?'active':''}" onclick="selectedDay=${i};renderSchedule()">${d.slice(0,2)}</button>`).join('');let selectedDate=dateForSelectedDay();let ls=data.lessons.filter(l=>l.day===selectedDay&&(l.weekly!==false||l.onceDate===selectedDate)).sort((a,b)=>a.time.localeCompare(b.time));$('scheduleList').innerHTML=ls.length?ls.map(l=>`<div class="schedule-row"><div class="time">${esc(l.time)}</div><div style="flex:1"><div class="schedule-title">${esc(l.name)}</div><div class="schedule-sub">${l.weekly===false?'Разовое занятие · '+formatDate(l.onceDate):'Каждую неделю · '+dayNames[l.day]}</div></div><button class="task-actions" onclick="deleteLesson(${l.id})">×</button></div>`).join(''):'<div class="empty">На этот день уроки не добавлены.</div>'}
+function deleteLesson(id){data.lessons=data.lessons.filter(l=>l.id!==id);save()}
+function renderEvents(){let ev=[...data.events].sort((a,b)=>a.date.localeCompare(b.date));$('upcoming').innerHTML=ev.filter(e=>e.date>=iso(today)).slice(0,4).map(e=>`<div class="schedule-row"><div class="time">${formatDate(e.date)}</div><div><div class="schedule-title">${esc(e.name)}</div><div class="schedule-sub">${esc(e.type)}</div></div></div>`).join('')||'<div class="empty">Предстоящих событий пока нет.</div>';$('eventList').innerHTML=ev.length?ev.map(e=>`<div class="schedule-row"><div class="time">${formatDate(e.date)}</div><div style="flex:1"><div class="schedule-title">${esc(e.name)}</div><div class="schedule-sub">${esc(e.type)}</div></div><button class="task-actions" onclick="deleteEvent(${e.id})">×</button></div>`).join(''):'<div class="empty">Добавь контрольную или важную дату.</div>'}
+function deleteEvent(id){data.events=data.events.filter(e=>e.id!==id);save()}
+function renderCalendar(){let y=calDate.getFullYear(),m=calDate.getMonth();$('monthTitle').textContent=monthNames[m]+' '+y;let first=new Date(y,m,1),offset=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate(),html=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="weekday">${x}</div>`).join('');for(let i=0;i<42;i++){let n=i-offset+1,dt=n<1?new Date(y,m-1,prev+n):n>days?new Date(y,m+1,n-days):new Date(y,m,n),s=iso(dt),ev=data.events.some(e=>e.date===s),ts=data.tasks.some(t=>t.date===s);html+=`<div class="calday ${dt.getMonth()!==m?'muted':''} ${s===iso(today)?'today':''}"><strong>${dt.getDate()}</strong>${ev?'<span class="dot" title="Событие"></span>':''}${ts?'<span class="dot" style="background:#29966b" title="Задание"></span>':''}</div>`} $('calendarGrid').innerHTML=html}
+function changeMonth(n){calDate.setMonth(calDate.getMonth()+n);renderCalendar()}
+const themeColors={blue:'#5267d8',purple:'#8056c8',green:'#258b68',pink:'#cc648d',orange:'#c77a32'};
+function setTheme(name){let c=themeColors[name]||themeColors.blue;document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-soft',c+'18');data.theme=name;localStorage.setItem(key,JSON.stringify(data))}
+$('themeColor').value=data.theme||'blue';setTheme(data.theme||'blue');$('themeColor').onchange=e=>setTheme(e.target.value);
+function renderAll(){renderTasks();renderSchedule();renderEvents();renderCalendar()}
+$('todayLabel').textContent=new Intl.DateTimeFormat('ru-RU',{weekday:'long',day:'numeric',month:'long'}).format(today);
+$('greeting').textContent=(today.getHours()<12?'Доброе утро!':today.getHours()<18?'Хорошего дня!':'Добрый вечер!')+' Готова спланировать учёбу?';
+renderAll();
+
+// Focus timer
+let duration=25*60,remaining=duration,interval=null;
+function timerPaint(){$('timerDisplay').textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0')}
+document.querySelectorAll('.timer-mode button').forEach(b=>b.onclick=()=>{clearInterval(interval);interval=null;$('timerStart').textContent='Начать';duration=+b.dataset.min*60;remaining=duration;document.querySelectorAll('.timer-mode button').forEach(x=>x.classList.toggle('active',x===b));timerPaint()});
+$('timerStart').onclick=()=>{if(interval){clearInterval(interval);interval=null;$('timerStart').textContent='Продолжить'}else{$('timerStart').textContent='Пауза';interval=setInterval(()=>{remaining--;timerPaint();if(remaining<=0){clearInterval(interval);interval=null;$('timerStart').textContent='Начать';toast('Время вышло! Сделай небольшой перерыв.');if('Notification'in window&&Notification.permission==='granted')new Notification('Время вышло!')}},1000)}};
+$('timerReset').onclick=()=>{clearInterval(interval);interval=null;remaining=duration;$('timerStart').textContent='Начать';timerPaint()};
+timerPaint();
+</script>
+</body></html>
